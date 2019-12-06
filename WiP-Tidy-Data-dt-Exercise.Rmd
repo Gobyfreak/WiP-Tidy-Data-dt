@@ -168,6 +168,93 @@ setcolorder(WP, c("Country", "Code", "Year", "pctWiP", "Ratio"))
 WP
 ```
 
+## Time trends for Portugal
+
+```{r}
+WP[Country %in% "Portugal"]
+```
+
+## Time trends for Greece
+
+```{r}
+GR<- WP[Country %in% "Greece"]
+GR
+```
+
+
+## Visualisation for PT
+
+```{r}
+library(ggplot2); theme_set(theme_classic())
+library(magrittr)
+WP[Country %in% "Portugal"] %>%
+  ggplot(aes(Year, pctWiP)) +
+  geom_line() + geom_point() +
+  scale_y_continuous(limits = c(0, 50)) +
+  ylab("% Women in Parliament PT")
+```
+
+
+## Visualisation for GR
+
+```{r}
+GR<- WP[Country %in% "Greece"] %>%
+  ggplot(aes(Year, pctWiP)) +
+  geom_line() + geom_point() +
+  scale_y_continuous(limits = c(0, 50)) +
+  ylab("% Women in Parliament GR")
+GR
+```
+
+## PT, GR vs other EU countries
+
+```{r}
+WP[Country %in% c("Portugal", "Greece", "Sweden", "Spain",
+                  "Hingary", "Romania", "Finland", "Germnay",
+                  "European Union")] %>%
+  ggplot(aes(Year, pctWiP, group=Country)) +
+  geom_line(aes(color=Country)) +
+  geom_point(aes(color=Country)) +
+  scale_x_continuous(breaks=seq(1990, 2020, 5)) +
+  scale_y_continuous(limits = c(0, 50),
+                     breaks=seq(0, 50, by=10)) +
+  ggtitle("Women in Parliament: EU Countries") +
+  ylab("% Women in Parliament")
+```
+
+
+# Countrues with the % of women in parliament
+
+```{r}
+WP[order(-pctWiP), head(.SD, 10)]
+```
+
+# Countries with % by year
+
+```{r}
+WP[order(Year, -pctWiP), head(.SD, 1), by = Year]
+```
+
+
+# Merging Continent
+```{r}
+library(countrycode)
+c1 <-as.data.table(codelist)[, .(continent, wb)]
+setnames(c1, c("continent", "wb"),
+         c("Continent", "Code"))
+cWP<- c1[WP, on="Code"]
+cWP
+```
+
+# Highest % by year % continent
+
+```{r}
+cWP[Year %in% c(1990, 2018) & !is.na(Continent)][
+  order(Year, -pctWiP), head(.SD, 1),
+  by = .(Year, Continent)][
+    order(Continent, Year),
+    .(Continent, Year, Country, pctWiP)]
+```
 
 
 
