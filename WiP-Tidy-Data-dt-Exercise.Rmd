@@ -1,6 +1,6 @@
 ---
 title: "Women in Parliament - Tidy Data"
-author: "Your Name Here"
+author: "Christos Gkenas"
 date: "`r format(Sys.time(), '%a %d %b %Y (%H:%M:%S)')`"
 output:
   html_document:
@@ -15,7 +15,6 @@ output:
     toc: yes
     toc_depth: '3'
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -112,8 +111,52 @@ wip <- fread(here("data", "WB-WiP.csv"),
 ```
 
 # Continue from here...
+## Structure the Data
+
+```{r}
+wip
+class(wip)
+str(wip)
+View(wip)
+names(wip)
+```
+
+## Removing column V65
+
+```{r}
+wip[, .N, by=, (V65)]
+```
+
+## Confirming "Infdicator.Name" and "Indicator.Code" have the same values for all observations
+
+```{r}
+wip[, .N, by=, (Indicator.Name)]
+wip[, .N, by=, (Indicator.Code)]
+```
 
 
+## Removing & Renaming columns
+```{r}
+wip[, c("Indicator.Name", "Indicator.Code", "V65"):=NULL]
+wip
+names(wip)
+setnames(wip, c("Country.Name", "Country.Code"), c("Country", "Code"))
+head(names(wip))
+tail(names(wip))
+```
+
+## Reshaping to long format & Removing the missing data
+
+```{r}
+WP <- melt(wip,
+           id.vars = c("Country", "Code"),
+           measure = patterns("^X"),
+           variable.name = "YearC",
+           value.name = c("pctWiP"),
+           na.rm = TRUE)
+WP
+View(WP)
+```
 
 
 
