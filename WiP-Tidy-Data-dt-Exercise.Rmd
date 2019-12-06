@@ -158,6 +158,15 @@ WP
 View(WP)
 ```
 
+## Final Tweaks
+
+```{r}
+WP[, `:=`(Year=as.numeric(gsub("X","", YearC)),
+          Ratio = (100-pctWiP)/pctWiP)][
+            , YearC:=NULL]
+setcolorder(WP, c("Country", "Code", "Year", "pctWiP", "Ratio"))
+WP
+```
 
 
 
